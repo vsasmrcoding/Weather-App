@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <main class="flex justify-center items-center min-h-[100vh] duration-1000">
+    <section class="rounded-[30px] shadow-[5px_6px_0px_-1px_rgba(0,0,0,1)] duration-1000 bg-[url(./25501.jpg)] bg-center bg-cover p-[15px]">
+        <div class="flex">
+            <form action="" id="searchForm">
+                <input type="text" placeholder="Enter Any Country & State Name" class="w-[300px] px-[20px] py-2 rounded-[20px_0px_0px_20px] m-0" name="search">
+                <input type="submit" value="Search" class="m-0 bg-[rgba(255,255,255,0.5)] text-black font-arial font-[600] rounded-[0px_20px_20px_0px] px-[10px] py-2">
+            </form>
+        </div>
+        <div class="box duration-1000">
+
+        </div>
+    </section>
+  </main>
+</body>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script>
+    $("#searchForm").on('submit',function(e){
+        e.preventDefault()
+        let sData = e.target.search.value
+        triggerDesign(sData)
+    })
+
+    const triggerDesign = async (v)=>{
+        let monthArray = ['Jan','Feb','March','April','May','June','July','August','Sept','Oct','Nov','Dec'];
+        let API = `http://api.weatherapi.com/v1/current.json?key=0aa4e5cfcc1a42b3b72113852242712&q=${v}&aqi=yes`;
+        let response = await fetch(API);
+        let Json = await response.json();
+        let design ;
+
+        try{
+            let localtime = new Date(Json.location.localtime);
+            let Month = localtime.getMonth();
+            let formatDate = `${localtime.getDate()}-${monthArray[Month-1]}-${localtime.getFullYear()}`;
+
+            let icon = Json.current.condition.icon;
+
+            design=`
+                <div class="bg-[rgba(255,255,255,0.5)] h-auto py-4 px-5 mt-4 rounded-[20px] duration-1000">
+                    <h3 class="text-black font-[700] text-[23px] mb-2 font-arial duration-1000">${Json.location.name}</h3>
+                    <p class="text-black font-[600] font-arial text-[17px] duration-1000">${formatDate}</p>
+                    <img src="https:${icon}" alt="" class="m-auto my-7 w-[150px] h-[150px] duration-1000"/>
+                    <h2 class="text-center text-black font-arial font-bold text-[55px] duration-1000">${Json.current.temp_c}</h2>
+                    <p class="text-center font-arial font-600 text-[19px] duration-1000">${Json.current.condition.text}</p>
+                </div>`;
+        }
+        catch(err){
+            design=`<div class="bg-[rgba(255,255,255,0.5)] h-auto py-4 px-5 mt-4 rounded-[20px] duration-1000">${Json.error.message}</div>`;
+        }
+
+        $('.box').html(design)
+    }
+</script>
+</html>
